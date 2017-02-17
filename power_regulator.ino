@@ -1,7 +1,7 @@
-#include <TFT.h>
+#include <max6675.h>
 
-//#include <Adafruit_GFX.h>
-//#include <Adafruit_PCD8544.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_PCD8544.h>
 #include "TimerOne.h"
 
 const unsigned buttonTimeoutMs = 100;
@@ -18,6 +18,11 @@ unsigned long adcTimestamp = 0;
 // pin 6 - LCD chip select (CS)
 // pin 7 - LCD reset (RST)
 Adafruit_PCD8544 display = Adafruit_PCD8544(3, 4, 5, 6, 7);
+
+int thermoDO = A0;
+int thermoCS = A1;
+int thermoCLK = A2;
+MAX6675 thermocouple(thermoCLK, thermoCS, thermoDO);
 
 void setup()   {
   Serial.begin(9600);
@@ -58,7 +63,7 @@ void loop()
   }
   
   if (millis() - adcTimestamp > adcTimeoutMs) {
-    temperature = analogRead(0) * 500. / 1024. - 273.15;
+    temperature = thermocouple.readCelsius();
     adcTimestamp = millis();
   }
   
