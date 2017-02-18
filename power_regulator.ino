@@ -1,14 +1,17 @@
 #include <max6675.h>
-
 #include <Adafruit_GFX.h>
 #include <Adafruit_PCD8544.h>
 #include "TimerOne.h"
+#include <PID_v1.h>
+
+const double minGoalTemperature = 0.;
+const double maxGoalTemperature = 200.;
 
 const unsigned buttonTimeoutMs = 100;
 const unsigned adcTimeoutMs = 500;
 
-float temperature = 0.;
-unsigned power = 0;
+double current_temperature = 0., goal_temperature = 0.;
+double power = 0; // [0..100]
 unsigned long buttonPressedTimestamp = 0;
 unsigned long adcTimestamp = 0;
 
@@ -24,6 +27,12 @@ int thermoCS = A1;
 int thermoCLK = A2;
 MAX6675 thermocouple(thermoCLK, thermoCS, thermoDO);
 
+double k_p = 8.17;
+double k_i = 8.88;
+double k_d = 1.14;
+
+PID myPID(&current_temperature, &power, &goal_temperature, k_p, k_i, k_d, DIRECT);
+
 void setup()   {
   Serial.begin(9600);
 
@@ -37,6 +46,9 @@ void setup()   {
   Timer1.initialize(100000); //us
   Timer1.pwm(9, 0);
   Timer1.attachInterrupt(timer1Callback);
+
+  myPID.SetOutputLimits(0., 100.);
+  myPID.SetMode(AUTOMATIC);
 }
 
 void lcdPrintString(String s) {
@@ -52,18 +64,19 @@ void timer1Callback() {
 void loop() 
 {
   if (millis() - buttonPressedTimestamp > buttonTimeoutMs) {
-    if (digitalRead(10) == HIGH && power > 0) {
-      power--;
+    if (digitalRead(10) == HIGH && goal_temperature > minGoalTemperature) {
+      goal_temperature -= 1;
       buttonPressedTimestamp = millis();
     }
-    if (digitalRead(12) == HIGH && power < 100) {
-      power++;
+    if (digitalRead(12) == HIGH && goal_temperature < maxGoalTemperature) {
+      goal_temperature += 1;
       buttonPressedTimestamp = millis();
     }
   }
   
   if (millis() - adcTimestamp > adcTimeoutMs) {
-    temperature = thermocouple.readCelsius();
+    current_temperature = thermocouple.readCelsius();
+    myPID.Compute();
     adcTimestamp = millis();
   }
   
@@ -71,10 +84,13 @@ void loop()
   display.setCursor(0, 0);
   display.setTextColor(BLACK);
   display.setTextSize(1);
-  display.setCursor(0, 0);
-  lcdPrintString("T: " + String(temperature, 1) + "C");
-  display.setCursor(0, 10);
-  lcdPrintString("P: " + String(power) + "%");
+  int line = 0;
+  display.setCursor(0, line++ * 10);
+  lcdPrintString("T_trgt: " + String(goal_temperature, 1) + "C");
+  display.setCursor(0, line++ * 10);
+  lcdPrintString("T_crnt: " + String(current_temperature, 1) + "C");
+  display.setCursor(0, line++ * 10);
+  lcdPrintString("P: " + String(power, 1) + "%");
   display.display();
 }
 
