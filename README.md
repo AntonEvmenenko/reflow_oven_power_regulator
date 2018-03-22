@@ -9,6 +9,7 @@ Power section of electrical circuit:
 Power regulator:
 
 ![alt text](https://github.com/AntonEvmenenko/power_regulator/blob/master/images/panel_front.png)
+![alt text](https://github.com/AntonEvmenenko/power_regulator/blob/master/images/panel_back.png)
 
 Assembled reflow oven:
 
