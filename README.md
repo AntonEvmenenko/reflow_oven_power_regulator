@@ -1,16 +1,16 @@
-## Description
+## Reflow Oven Power Regulator
 
-Power regulator for reflow oven, based on Arduino. Thermocouple is used to measure the temperature, PID regulator -- for control.
+This project provides some information about an Arduino-based reflow oven. A thermocouple is utilized for temperature measurement, and a PID regulator is employed for control.
 
-Power section of electrical circuit:
+The power section fragment of the electrical schematic is displayed below:
 
-![alt text](https://github.com/AntonEvmenenko/power_regulator/blob/master/images/schematic.png)
+![alt text](./images/schematic.png)
 
-Power regulator:
+Here are the front and back views of the power regulator:
 
-![alt text](https://github.com/AntonEvmenenko/power_regulator/blob/master/images/panel_front.png)
-![alt text](https://github.com/AntonEvmenenko/power_regulator/blob/master/images/panel_back.png)
+![alt text](./images/panel_front.png)
+![alt text](./images/panel_back.png)
 
-Assembled reflow oven:
+Lastly, here is an image of the fully assembled reflow oven:
 
-![alt text](https://github.com/AntonEvmenenko/power_regulator/blob/master/images/reflow_oven.png)
+![alt text](./images/reflow_oven.png)
